@@ -1,0 +1,75 @@
+* {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+body {
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  color: #fff;
+  min-height: 100vh;
+}
+
+header {
+  text-align: center;
+  padding: 30px;
+}
+
+header h1 {
+  font-size: 2.5rem;
+}
+
+header p {
+  opacity: 0.8;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  padding: 40px;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 25px;
+  border-radius: 12px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  transition: transform 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+}
+
+.card h2 {
+  margin-bottom: 15px;
+  color: #00eaff;
+}
+
+.deploy {
+  text-align: center;
+  padding-bottom: 40px;
+}
+
+button {
+  background: #00eaff;
+  border: none;
+  padding: 15px 30px;
+  font-size: 1rem;
+  border-radius: 25px;
+  cursor: pointer;
+  color: #000;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background: #00bcd4;
+}
+
+#deployMessage {
+  margin-top: 15px;
+  font-weight: bold;
+}
