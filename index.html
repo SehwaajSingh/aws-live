@@ -1,44 +1,563 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>DevOps & Cloud Dashboard</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalLogi · cloud parcel tracker</title>
+    <!-- Font Awesome for icons (free) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        body {
+            background: #f3f6fc;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+        .agent-card {
+            max-width: 1300px;
+            width: 100%;
+            background: white;
+            border-radius: 2.5rem 2.5rem 2rem 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 32, 64, 0.25);
+            overflow: hidden;
+            border: 1px solid rgba(0,112,243,0.15);
+        }
+        /* header – cloud bar */
+        .cloud-header {
+            background: linear-gradient(98deg, #0b2b44 0%, #133e5e 100%);
+            padding: 1.5rem 2.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            color: white;
+            border-bottom: 4px solid #3b82f6;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo-icon {
+            background: rgba(255,255,255,0.12);
+            padding: 10px 14px;
+            border-radius: 40px;
+            font-size: 1.8rem;
+            backdrop-filter: blur(4px);
+        }
+        .logo-text h1 {
+            font-weight: 600;
+            font-size: 1.9rem;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+        }
+        .logo-text span {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 4px;
+        }
+        .badge-cloud {
+            background: #2563eb;
+            padding: 0.5rem 1.4rem;
+            border-radius: 100px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #60a5fa;
+        }
+        .badge-cloud i {
+            font-size: 1rem;
+        }
+
+        /* main layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 2rem;
+            padding: 2.2rem 2.5rem 2.5rem 2.5rem;
+            background: #ffffff;
+        }
+        @media (max-width: 850px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+
+        /* left panel – new parcel / agent toolbox */
+        .toolbox {
+            background: #f8fafd;
+            border-radius: 1.8rem;
+            padding: 1.8rem 1.8rem 2rem 1.8rem;
+            border: 1px solid #e9eef3;
+            box-shadow: 0 6px 14px rgba(0,27,55,0.03);
+        }
+        .toolbox h2 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #0b2b44;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 0.25rem;
+        }
+        .toolbox h2 i {
+            color: #2563eb;
+            font-size: 1.8rem;
+        }
+        .agent-note {
+            color: #4b5a6b;
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px dashed #cbd5e1;
+        }
+        .input-group {
+            margin-bottom: 2rem;
+        }
+        .input-group label {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #1e3a5f;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .input-group label i {
+            width: 22px;
+            color: #3b82f6;
+        }
+        .input-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .input-row input {
+            flex: 2;
+            min-width: 200px;
+            padding: 14px 18px;
+            border: 2px solid #dde3ea;
+            border-radius: 40px;
+            font-size: 1rem;
+            background: white;
+            transition: 0.15s;
+            outline: none;
+        }
+        .input-row input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59,130,246,0.15);
+        }
+        .input-row button {
+            background: #0b2b44;
+            border: none;
+            color: white;
+            padding: 14px 26px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.2s;
+            border: 1px solid #2d4b6e;
+            white-space: nowrap;
+        }
+        .input-row button:hover {
+            background: #1e3f5c;
+            transform: scale(1.02);
+            box-shadow: 0 8px 18px rgba(0,50,100,0.2);
+        }
+        .demo-hint {
+            background: #e6f0ff;
+            border-radius: 30px;
+            padding: 0.9rem 1.5rem;
+            color: #004080;
+            font-weight: 500;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid #b8d3ff;
+            margin-top: 20px;
+        }
+        .demo-hint i {
+            font-size: 1.3rem;
+        }
+
+        /* active deliveries list */
+        .delivery-list {
+            background: white;
+            border-radius: 1.8rem;
+            border: 1px solid #eef2f6;
+            padding: 0.1rem 0 1rem 0;
+            box-shadow: 0 8px 18px #dfe9f3;
+        }
+        .list-header {
+            background: #f0f6ff;
+            padding: 1.4rem 2rem;
+            border-radius: 1.8rem 1.8rem 0 0;
+            border-bottom: 1px solid #dde5ef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .list-header h3 {
+            font-weight: 700;
+            color: #102b47;
+            font-size: 1.35rem;
+        }
+        .list-header h3 i {
+            margin-right: 8px;
+            color: #2563eb;
+        }
+        .list-header .live-badge {
+            background: #22c55e;
+            color: white;
+            padding: 0.35rem 1rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .parcels-container {
+            max-height: 380px;
+            overflow-y: auto;
+            padding: 0.5rem 1rem 1rem 1rem;
+        }
+        .parcel-item {
+            background: white;
+            margin: 0.7rem 0.5rem;
+            padding: 1rem 1.5rem 1rem 1.5rem;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            border: 1.5px solid #eef2f8;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            transition: 0.1s;
+        }
+        .parcel-item:hover {
+            border-color: #b3d0ff;
+            background: #fbfdff;
+        }
+        .parcel-info {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+        .parcel-tag {
+            background: #dee9fc;
+            color: #00337e;
+            font-weight: 700;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            letter-spacing: 0.3px;
+        }
+        .parcel-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f4f9ff;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+        }
+        .status-dot {
+            width: 11px;
+            height: 11px;
+            border-radius: 20px;
+            background: #f59e0b;
+        }
+        .status-dot.delivered { background: #10b981; }
+        .status-dot.picked { background: #3b82f6; }
+        .parcel-action {
+            display: flex;
+            gap: 8px;
+        }
+        .parcel-action button {
+            background: none;
+            border: 1px solid #ccdbe9;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #1f3a5f;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .parcel-action button:hover {
+            background: #ebf3ff;
+            border-color: #3b82f6;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            color: #7f8fa4;
+            font-style: italic;
+        }
+
+        /* footer – aws mock */
+        .cloud-footer {
+            background: #eef4fa;
+            padding: 1.3rem 2.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #cbddee;
+            color: #1e3e64;
+            font-size: 0.9rem;
+        }
+        .aws-badge {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .aws-badge i {
+            color: #ff9900;
+            font-size: 1.6rem;
+        }
+    </style>
 </head>
 <body>
-
-  <header>
-    <h1>☁️ DevOps & Cloud Dashboard</h1>
-    <p>Monitor • Deploy • Scale</p>
-  </header>
-
-  <section class="cards">
-    <div class="card">
-      <h2>Cloud Status</h2>
-      <p id="cloudStatus">Checking...</p>
+<div class="agent-card">
+    <!-- cloud header -->
+    <div class="cloud-header">
+        <div class="logo-area">
+            <div class="logo-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+            <div class="logo-text">
+                <h1>LocalLogi · cloud</h1>
+                <span><i class="fas fa-map-pin"></i> agent console — demo (static AWS)</span>
+            </div>
+        </div>
+        <div class="badge-cloud">
+            <i class="fas fa-wifi"></i> live · cloud sync
+        </div>
     </div>
 
-    <div class="card">
-      <h2>CI/CD Pipeline</h2>
-      <p id="pipelineStatus">Running...</p>
+    <!-- main dashboard grid -->
+    <div class="dashboard-grid">
+        <!-- left: agent toolbox (create parcel) -->
+        <div class="toolbox">
+            <h2><i class="fas fa-boxes"></i> agent toolbox</h2>
+            <div class="agent-note">
+                <i class="fas fa-user-shield"></i> Logged as: <strong>Eastside depot · ID 42</strong> (local logistic)
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-pencil-alt"></i> New parcel tracking ID</label>
+                <div class="input-row">
+                    <input type="text" id="trackingInput" placeholder="e.g. LZ-4821, PKG-72 ..." value="LZ-4821">
+                    <button id="addParcelBtn"><i class="fas fa-plus-circle"></i> Add parcel</button>
+                </div>
+                <div class="demo-hint">
+                    <i class="fas fa-lightbulb"></i> Use any ID – demo stores in your browser memory.
+                </div>
+            </div>
+
+            <!-- quick status update info (simple agent guide) -->
+            <div style="background: #eaf3ff; border-radius: 30px; padding: 1.2rem; margin-top: 20px;">
+                <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 10px;">
+                    <i class="fas fa-tasks" style="color: #2563eb;"></i>
+                    <span style="font-weight:600;">Quick actions (agent)</span>
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <span style="background: white; border-radius: 30px; padding:0.3rem 1rem; border:1px solid #ccc;"><i class="fas fa-circle" style="color: #f59e0b; font-size: 0.6rem;"></i> pending</span>
+                    <span style="background: white; border-radius: 30px; padding:0.3rem 1rem; border:1px solid #ccc;"><i class="fas fa-circle" style="color: #3b82f6; font-size: 0.6rem;"></i> picked up</span>
+                    <span style="background: white; border-radius: 30px; padding:0.3rem 1rem; border:1px solid #ccc;"><i class="fas fa-circle" style="color: #10b981; font-size: 0.6rem;"></i> delivered</span>
+                </div>
+                <p style="margin-top: 15px; font-size:0.85rem; color: #2b3d5c;"><i class="fas fa-mouse-pointer"></i> Click on any parcel below to change status (agent simulation).</p>
+            </div>
+        </div>
+
+        <!-- right: active deliveries (live list) -->
+        <div class="delivery-list">
+            <div class="list-header">
+                <h3><i class="fas fa-truck"></i> active track & trace</h3>
+                <div class="live-badge"><i class="fas fa-circle"></i> LIVE · cloud</div>
+            </div>
+            <div class="parcels-container" id="parcelList">
+                <!-- dynamic javascript list will be injected here -->
+                <!-- static fallback: will be replaced, but shows concept -->
+            </div>
+            <div style="padding: 0.8rem 2rem 1.2rem 2rem; border-top: 1px solid #dde5ef; color:#476788;">
+                <i class="fas fa-cloud"></i> last sync: just now · <span id="counterDisplay">0 parcels</span>
+            </div>
+        </div>
     </div>
 
-    <div class="card">
-      <h2>Server Health</h2>
-      <p id="serverHealth">Loading...</p>
+    <!-- footer: aws static hosting mock -->
+    <div class="cloud-footer">
+        <div class="aws-badge">
+            <i class="fab fa-aws"></i>
+            <span>static demo · amazon S3 / cloudfront</span>
+        </div>
+        <div><i class="far fa-clock"></i> pretending cloud-based parcel system for local agents</div>
     </div>
+</div>
 
-    <div class="card">
-      <h2>Environment</h2>
-      <p id="environment">Production</p>
-    </div>
-  </section>
+<script>
+    (function() {
+        // ----- demo cloud parcel tracking -----
+        // things you need to know (embedded as comments)
+        /*
+           1. parcels are stored in memory (array) – represents cloud dataset.
+           2. every change (add, status update) re-renders the list → simulates cloud sync.
+           3. agent can add any tracking ID, initial status 'pending' (orange).
+           4. clicking on a parcel toggles status: pending → picked → delivered → pending (demo cycle).
+           5. UI shows current cloud state – static page works standalone (no real API).
+           6. Host on AWS S3 / any static host – everything local in browser.
+           7. Perfect for demo walkthrough: local logistic agents manage parcels.
+        */
 
-  <section class="deploy">
-    <button onclick="deployApp()">🚀 Deploy Application</button>
-    <p id="deployMessage"></p>
-  </section>
+        // initial parcel cloud dataset
+        let parcels = [
+            { id: 'PKG-1042', status: 'pending' },
+            { id: 'LZ-871', status: 'picked' },
+            { id: 'DEL-335', status: 'delivered' },
+            { id: 'CARG-O22', status: 'pending' },
+        ];
 
-  <script src="script.js"></script>
+        // helper: get next status in cycle (agent quick action)
+        function nextStatus(current) {
+            if (current === 'pending') return 'picked';
+            if (current === 'picked') return 'delivered';
+            return 'pending'; // delivered -> pending (cycle)
+        }
+
+        // render function (cloud sync simulation)
+        function renderParcels() {
+            const container = document.getElementById('parcelList');
+            const counterSpan = document.getElementById('counterDisplay');
+            if (!container) return;
+
+            if (parcels.length === 0) {
+                container.innerHTML = `<div class="empty-message"><i class="fas fa-box-open" style="font-size:2rem; opacity:0.5; margin-bottom:0.5rem;"></i><br />No parcels yet. Add one using the toolbox.</div>`;
+                if (counterSpan) counterSpan.innerText = '0 parcels';
+                return;
+            }
+
+            let html = '';
+            parcels.forEach((p, index) => {
+                let statusColor = '#f59e0b';   // pending
+                let statusText = 'pending';
+                let dotClass = 'status-dot';
+                if (p.status === 'picked') {
+                    statusColor = '#3b82f6';
+                    statusText = 'picked up';
+                    dotClass += ' picked';
+                } else if (p.status === 'delivered') {
+                    statusColor = '#10b981';
+                    statusText = 'delivered';
+                    dotClass += ' delivered';
+                }
+
+                html += `
+                    <div class="parcel-item" data-index="${index}">
+                        <div class="parcel-info">
+                            <span class="parcel-tag"><i class="fas fa-cube"></i> ${p.id}</span>
+                            <span class="parcel-status">
+                                <span class="${dotClass}" style="background: ${statusColor};"></span>
+                                ${statusText}
+                            </span>
+                        </div>
+                        <div class="parcel-action">
+                            <button class="status-toggle" data-index="${index}"><i class="fas fa-sync-alt"></i> update</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+            if (counterSpan) counterSpan.innerText = parcels.length + (parcels.length === 1 ? ' parcel' : ' parcels');
+
+            // attach event listeners to each status toggle button (delegation would work but we attach after render)
+            document.querySelectorAll('.status-toggle').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const idx = this.getAttribute('data-index');
+                    if (idx !== null) {
+                        const index = parseInt(idx, 10);
+                        if (parcels[index]) {
+                            // cloud update: change status
+                            parcels[index].status = nextStatus(parcels[index].status);
+                            renderParcels();  // re-render (simulate cloud sync)
+                        }
+                    }
+                });
+            });
+
+            // optional: clicking whole item also toggles? we already have button, but we can add double-click or item click?
+            // but we want button to be explicit, so keep that.
+        }
+
+        // add new parcel (agent action)
+        function addParcelFromInput() {
+            const input = document.getElementById('trackingInput');
+            let newId = input.value.trim();
+            if (newId === '') {
+                alert('please enter a tracking ID');
+                return;
+            }
+            // avoid duplicates? demo allows duplicates but that's ok – but we check to avoid confusion
+            if (parcels.some(p => p.id.toUpperCase() === newId.toUpperCase())) {
+                alert('parcel with similar ID already exists (demo). you can still add, but we append.');
+            }
+            // add as pending
+            parcels.push({ id: newId, status: 'pending' });
+            renderParcels();
+            // keep input value for next, but optionally clear? we set a little placeholder again
+            input.value = 'LZ-' + Math.floor(Math.random()*900+100); // random suggestion
+        }
+
+        // wait for DOM
+        window.addEventListener('DOMContentLoaded', function() {
+            renderParcels();
+
+            // add button event
+            document.getElementById('addParcelBtn').addEventListener('click', addParcelFromInput);
+
+            // also allow enter key in input
+            document.getElementById('trackingInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addParcelFromInput();
+                }
+            });
+
+            // (optional) explanation: things you need to know before making it.
+            console.log('Things to know for cloud parcel system (demo):');
+            console.log('1. Parcels stored locally in array → pretend cloud db.');
+            console.log('2. UI updates on any change = cloud sync illusion.');
+            console.log('3. Agent actions: add / cycle status.');
+            console.log('4. Host on AWS S3: static file, no server needed.');
+            console.log('5. Styling works mobile/desktop.');
+        });
+    })();
+</script>
+<!-- tiny extra style for smoother scroll -->
+<style>
+    .parcels-container::-webkit-scrollbar { width: 6px; background: #f0f4fc; border-radius: 6px; }
+    .parcels-container::-webkit-scrollbar-thumb { background: #b7c9e0; border-radius: 6px; }
+</style>
 </body>
 </html>
